@@ -145,6 +145,7 @@ class TorchMD_Net(nn.Module):
         derivative=False,
         output_model_noise=None,
         position_noise_scale=0.,
+        denoising_via_rdkit=True,
     ):
         super(TorchMD_Net, self).__init__()
         self.representation_model = representation_model
@@ -164,13 +165,13 @@ class TorchMD_Net(nn.Module):
         self.derivative = derivative
         self.output_model_noise = output_model_noise        
         self.position_noise_scale = position_noise_scale
-
+        self.denoising_via_rdkit=denoising_via_rdkit
         mean = torch.scalar_tensor(0) if mean is None else mean
         self.register_buffer("mean", mean)
         std = torch.scalar_tensor(1) if std is None else std
         self.register_buffer("std", std)
 
-        if self.position_noise_scale > 0:
+        if self.position_noise_scale > 0 or self.denoising_via_rdkit:
             self.pos_normalizer = AccumulatedNormalization(accumulator_shape=(3,))
 
         self.reset_parameters()
