@@ -19,6 +19,7 @@ from torchmdnet.utils import LoadFromFile, LoadFromCheckpoint, save_argparse, nu
 from pathlib import Path
 import wandb
 
+
 def get_args():
     # fmt: off
     parser = argparse.ArgumentParser(description='Training')
@@ -70,6 +71,7 @@ def get_args():
     parser.add_argument('--position-noise-scale', default=0., type=float, help='Scale of Gaussian noise added to positions.')
     parser.add_argument('--denoising-weight', default=0., type=float, help='Weighting factor for denoising in the loss function.')
     parser.add_argument('--denoising-only', type=bool, default=False, help='If the task is denoising only (then val/test datasets also contain noise).')
+    parser.add_argument('--denoising-via-rdkit', type=bool, default=False, help='If the task is denoising only (then val/test datasets also contain noise).')
 
     # model architecture
     parser.add_argument('--model', type=str, default='graph-network', choices=models.__all__, help='Which model to train')
@@ -144,7 +146,6 @@ def main():
     data = DataModule(args)
     data.prepare_data()
     data.setup("fit")
-
     prior = None
     if args.prior_model:
         assert hasattr(priors, args.prior_model), (
@@ -196,7 +197,7 @@ def main():
         resume_from_checkpoint=args.load_model,
         callbacks=[early_stopping, checkpoint_callback],
         logger=[tb_logger, csv_logger, 
-        #wandb_logger#
+        wandb_logger
         ],
         reload_dataloaders_every_epoch=False,
         precision=args.precision,
