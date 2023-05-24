@@ -8,7 +8,7 @@ from pytorch_lightning.utilities import rank_zero_warn
 from torchmdnet import datasets
 from torchmdnet.utils import make_splits, MissingEnergyException
 from torch_scatter import scatter
-
+import pandas as pd
 
 class DataModule(LightningDataModule):
     def __init__(self, hparams, dataset=None):
@@ -17,7 +17,6 @@ class DataModule(LightningDataModule):
         self._mean, self._std = None, None
         self._saved_dataloaders = dict()
         self.dataset = dataset
-
     def setup(self, stage):
         if self.dataset is None: #if dataset id custom
             if self.hparams["dataset"] == "Custom":
@@ -33,6 +32,24 @@ class DataModule(LightningDataModule):
                         noise = torch.randn_like(data.pos) * self.hparams['position_noise_scale']
                         data.pos_target = noise
                         data.pos = data.pos + noise
+                        return data
+                elif self.hparams['denoising_via_rdkit']:
+                    def transform(data):
+                        from rdkit import Chem
+                        import numpy as np
+                        from rdkit.Chem import AllChem
+                        from rdkit.Geometry import Point3D
+                        noisy_conf=data.noisy_mol.GetConformer()
+                        noisy_conf_positions=noisy_conf.GetPositions()
+                        noise=np.random.randn(data.pos.shape[0],data.pos.shape[1]) 
+                        noisy_positions=noisy_conf_positions+noise
+                        for i in range(data.noisy_mol.GetNumAtoms()):
+                            noisy_conf.SetAtomPosition(i, Point3D(noisy_positions[i][0],noisy_positions[i][1],noisy_positions[i][2]))      
+                        Chem.rdForceFieldHelpers.UFFOptimizeMolecule(data.noisy_mol,confId=0,maxIters=40)
+                        noisy_conf_positions=torch.tensor(noisy_conf.GetPositions(), dtype=torch.float)
+                        noise=noisy_conf_positions-data.pos
+                        data.pos_target=noise
+                        data.pos=noisy_conf_positions
                         return data
                 else:
                     transform = None
