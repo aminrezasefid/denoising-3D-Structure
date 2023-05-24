@@ -2,7 +2,7 @@ activation: silu
 aggr: add
 atom_filter: -1
 attn_activation: silu
-batch_size: 128
+batch_size: 64
 coord_files: null
 cutoff_lower: 0.0
 cutoff_upper: 5.0
@@ -21,7 +21,7 @@ energy_files: null
 energy_weight: 0.0
 force_files: null
 force_weight: 1.0
-inference_batch_size: 70
+inference_batch_size: 64
 load_model: null
 log_dir: experiments/
 lr: 0.0004
