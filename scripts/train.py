@@ -197,7 +197,7 @@ def main():
         resume_from_checkpoint=args.load_model,
         callbacks=[early_stopping, checkpoint_callback],
         logger=[tb_logger, csv_logger, 
-        wandb_logger
+        #wandb_logger
         ],
         reload_dataloaders_every_epoch=False,
         precision=args.precision,

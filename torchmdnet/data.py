@@ -45,8 +45,9 @@ class DataModule(LightningDataModule):
                         noisy_positions=noisy_conf_positions+noise
                         for i in range(data.noisy_mol.GetNumAtoms()):
                             noisy_conf.SetAtomPosition(i, Point3D(noisy_positions[i][0],noisy_positions[i][1],noisy_positions[i][2]))      
-                        data.noisy_mol=Chem.AddHs(data.noisy_mol,addCoords=True)
-                        Chem.rdForceFieldHelpers.UFFOptimizeMolecule(data.noisy_mol,confId=0,maxIters=40)
+                        #data.noisy_mol=Chem.AddHs(data.noisy_mol,addCoords=True)
+                        Chem.rdForceFieldHelpers.UFFOptimizeMolecule(data.noisy_mol,confId=0,maxIters=200)
+                        Chem.rdMolAlign.AlignMol(data.noisy_mol,data.mol)
                         noisy_conf_positions=torch.tensor(noisy_conf.GetPositions(), dtype=torch.float)
                         noise=noisy_conf_positions-data.pos
                         data.pos_target=noise
