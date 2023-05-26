@@ -173,7 +173,7 @@ def main():
         args.log_dir, name="tensorbord", version="", default_hp_metric=False
     )
     csv_logger = CSVLogger(args.log_dir, name="", version="")
-    wandb_logger = WandbLogger(name=args.job_id, project='pre-training-via-denoising', notes=args.wandb_notes, settings=wandb.Settings(start_method='thread', code_dir="."))
+    wandb_logger = WandbLogger(name=args.job_id+"-posfixed", project='pre-training-via-denoising', notes=args.wandb_notes, settings=wandb.Settings(start_method='thread', code_dir="."))
 
     @rank_zero_only
     def log_code():
