@@ -9,7 +9,8 @@ from torchmdnet import datasets
 from torchmdnet.utils import make_splits, MissingEnergyException
 from torch_scatter import scatter
 import pandas as pd
-
+from rdkit import RDLogger 
+RDLogger.DisableLog('rdApp.*')
 class DataModule(LightningDataModule):
     def __init__(self, hparams, dataset=None):
         super(DataModule, self).__init__()
