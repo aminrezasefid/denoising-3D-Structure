@@ -139,6 +139,8 @@ class QM9(QM9_geometric): # dataset downloding and others processing
         params = Chem.SmilesParserParams()
         params.removeHs = False
         counter=0
+        ps = rdDistGeom.ETKDGv3()
+        ps.maxIters=100
         for i, mol in enumerate(tqdm(suppl)):
             if i in skip or mol==None:
                 continue
@@ -198,18 +200,19 @@ class QM9(QM9_geometric): # dataset downloding and others processing
             smi=Chem.MolToSmiles(mol)
             noisy_mol=Chem.MolFromSmiles(smi,params)
             smi2=Chem.MolToSmiles(noisy_mol)
-            ps = rdDistGeom.ETKDGv3()
-            ps.maxIters=100
             generated=-1
             generated=rdDistGeom.EmbedMolecule(noisy_mol,ps)
             if generated==-1:
                 continue
             try:
-                Chem.rdMolAlign.AlignMol(mol,noisy_mol)
+                mapping = noisy_mol.GetSubstructMatch(mol)
+                noisy_mol = Chem.RenumberAtoms(noisy_mol, mapping)
+                Chem.rdMolAlign.AlignMol(noisy_mol,mol)
             except:
                 continue
             # data = Data(x=x, z=z, pos=pos, edge_index=edge_index,
             #             edge_attr=edge_attr, y=y, name=name, idx=i,mol=mol,noisy_mol=noisy_mol)
+            
             data = Data(x=x, z=z, pos=pos, edge_index=edge_index,
                         edge_attr=edge_attr, name=name, idx=i,mol=mol,noisy_mol=noisy_mol)
             if self.pre_filter is not None and not self.pre_filter(data):
