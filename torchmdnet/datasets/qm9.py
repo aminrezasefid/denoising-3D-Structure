@@ -205,11 +205,13 @@ class QM9(QM9_geometric): # dataset downloding and others processing
             if generated==-1:
                 continue
             try:
-                Chem.rdMolAlign.AlignMol(mol,noisy_mol)
+                Chem.rdMolAlign.AlignMol(noisy_mol,mol)
             except:
                 continue
             # data = Data(x=x, z=z, pos=pos, edge_index=edge_index,
             #             edge_attr=edge_attr, y=y, name=name, idx=i,mol=mol,noisy_mol=noisy_mol)
+            mapping = noisy_mol.GetSubstructMatch(mol)
+            noisy_mol = Chem.RenumberAtoms(noisy_mol, mapping)
             data = Data(x=x, z=z, pos=pos, edge_index=edge_index,
                         edge_attr=edge_attr, name=name, idx=i,mol=mol,noisy_mol=noisy_mol)
             if self.pre_filter is not None and not self.pre_filter(data):
