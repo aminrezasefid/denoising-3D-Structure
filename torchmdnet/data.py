@@ -41,7 +41,7 @@ class DataModule(LightningDataModule):
                         from rdkit.Geometry import Point3D
                         noisy_conf=data.noisy_mol.GetConformer()
                         noisy_conf_positions=noisy_conf.GetPositions()
-                        noise=np.random.randn(data.pos.shape[0],data.pos.shape[1]) 
+                        noise=np.random.randn(data.pos.shape[0],data.pos.shape[1]) * self.hparams["rdkit_noise_scale"]
                         noisy_positions=noisy_conf_positions+noise
                         for i in range(data.noisy_mol.GetNumAtoms()):
                             noisy_conf.SetAtomPosition(i, Point3D(noisy_positions[i][0],noisy_positions[i][1],noisy_positions[i][2]))      
