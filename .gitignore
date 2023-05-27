@@ -133,7 +133,7 @@ dmypy.json
 
 # temp directories
 logs/
-
+result/
 wandb/
 tmp/
 lightning_logs/
