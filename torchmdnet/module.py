@@ -137,7 +137,7 @@ class LNNP(LightningModule):
                 noise_pred = noise_pred + pred.sum() * 0
                 
             normalized_pos_target = self.model.pos_normalizer(batch.pos_target)
-            loss_pos = loss_fn(noise_pred, batch.pos_target)
+            loss_pos = loss_fn(noise_pred, normalized_pos_target)
             self.losses[stage + "_pos"].append(loss_pos.detach())
 
         # total loss
